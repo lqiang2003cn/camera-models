@@ -13,8 +13,6 @@ def draw3d_arrow(
     name: Optional[str] = None,
     ax: Optional[Axes3D] = None,
 ) -> Axes3D:
-    if ax is None:
-        ax = plt.gca(projection="3d")
 
     ax.quiver(
         *arrow_location,
@@ -40,9 +38,6 @@ def set_xyzlim3d(
     right: Optional[float] = None,
     ax: Optional[Axes3D] = None,
 ) -> Axes3D:
-    if ax is None:
-        ax = plt.gca(projection="3d")
-
     ax.set_xlim3d(left, right)
     ax.set_ylim3d(left, right)
     ax.set_zlim3d(left, right)
@@ -50,9 +45,6 @@ def set_xyzlim3d(
 
 
 def set_xyzticks(ticks: List[float], ax: Optional[Axes3D] = None) -> Axes3D:
-    if ax is None:
-        ax = plt.gca(projection="3d")
-
     ax.set_xticks(ticks)
     ax.set_yticks(ticks)
     ax.set_zticks(ticks)
