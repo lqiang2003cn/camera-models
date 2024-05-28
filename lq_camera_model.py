@@ -135,6 +135,8 @@ camera_frame = ReferenceFrame(
     dz=R @ dz,
     name="Camera",
 )
+
+# Start from here
 Z = PrincipalAxis(
     camera_center=camera_frame.origin,
     camera_dz=camera_frame.dz,
