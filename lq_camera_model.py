@@ -15,7 +15,7 @@ print(f"X in homogeneous coordinates: {Xh}")
 X = to_inhomogeneus(Xh)
 print(f"X: {X}")
 
-###############################################################################
+######################################################################################################################################
 fig = plt.figure()
 ax = fig.add_subplot(2, 2, 1, projection="3d")
 Rx = get_rotation_matrix(theta_x=np.pi / 2.0)  # Roll
@@ -75,9 +75,9 @@ set_xyzticks([], ax=ax)
 ax.set_title(f"Yaw (90°)")
 fig.suptitle("Camera Rotation")
 plt.tight_layout()
-plt.show()
+# plt.show()
 
-###############################################################################
+######################################################################################################################################
 fig = plt.figure()
 ax = fig.add_subplot(projection='3d')
 world_origin = np.zeros(3)
@@ -107,18 +107,19 @@ set_xyzlim3d(-5, 5, ax=ax)
 # plt.show()
 
 
-###############################################################################
+######################################################################################################################################
 F = 3.0  # focal length
 PX = 2.0  # principal point x-coordinate
 PY = 1.0  # principal point y-coordinate
 THETA_X = np.pi / 2  # roll angle
 # THETA_Y = np.pi / 2
-THETA_Z = np.pi  # yaw angle
+# THETA_Z = np.pi  # yaw angle
+THETA_Z = 0
 C = np.array([3, -5, 2])  # camera centre
 IMAGE_HEIGTH = 4
 IMAGE_WIDTH = 6
 
-R = get_rotation_matrix(theta_x=THETA_X,  theta_z=THETA_Z)
+R = get_rotation_matrix(theta_x=THETA_X, theta_z=THETA_Z)
 world_origin = np.zeros(3)
 dx, dy, dz = np.eye(3)
 world_frame = ReferenceFrame(
@@ -166,5 +167,179 @@ Z.draw3d(ax=ax)
 image_plane.draw3d(ax=ax)
 ax.view_init(elev=30.0, azim=30.0)
 ax.set_title("Pinhole Camera Geometry")
+plt.tight_layout()
+# plt.show()
+
+######################################################################################################################################
+X = np.array([-1, 2, 3])
+# X = np.array([4, 2, 3])
+G = GenericPoint(X, name="X")
+L = get_plucker_matrix(C, X)
+X1 = image_frame.origin
+X2 = X1 + image_frame.dx
+X3 = X1 + image_frame.dy
+pi = get_plane_from_three_points(X1, X2, X3)
+x = to_inhomogeneus(L @ pi)
+print(f"X:\n{X}")
+print(f"\nL:\n{L.round(DECIMALS)}")
+print(f"\nX1:\n{X1}")
+print(f"\nX2:\n{X2}")
+print(f"\nX3:\n{X3}")
+print(f"\npi:\n{pi.round(DECIMALS)}")
+print(f"\nx:\n{x.round(DECIMALS)}")
+fig = plt.figure(figsize=(6, 6))
+ax = plt.axes(projection="3d")
+ax.text(*C, "C")
+world_frame.draw3d(ax=ax)
+camera_frame.draw3d(ax=ax)
+image_frame.draw3d(ax=ax)
+Z.draw3d(ax=ax)
+image_plane.draw3d(ax=ax)
+G.draw3d(pi, C=C, ax=ax)
+ax.view_init(elev=30.0, azim=30.0)
+ax.set_title(f"Representation of a Generic Point in 3D (X = {X})")
+plt.tight_layout()
+# plt.show()
+
+##########################################################################################################################
+F = 3.0  # focal length
+PX = 2.0  # principal point x-coordinate
+PY = 1.0  # principal point y-coordinate
+IMAGE_HEIGTH = 4
+IMAGE_WIDTH = 6
+X = np.array([-1, 2, 3])
+Xh = to_homogeneus(X)
+K = get_calibration_matrix(F, px=PX, py=PY)
+P = get_projection_matrix(F, px=PX, py=PY)
+xh = P @ Xh
+x = to_inhomogeneus(xh)
+print("\nX:\n", X)
+print("\nCalibration matrix (K):\n", K)
+print("\nProjection matrix (P):\n", P)
+print("\nx:\n", x)
+image = Image(heigth=IMAGE_HEIGTH, width=IMAGE_WIDTH)
+G = GenericPoint(X, name="X")
+fig = plt.figure(figsize=(IMAGE_WIDTH, IMAGE_HEIGTH))
+ax = fig.gca()
+image.draw()
+G.draw(F, px=PX, py=PY)
+ax.set_title("Image of the Point X")
+plt.tight_layout()
+# plt.show()
+
+
+##############################################################################################################
+MX = 2  # number of pixels per unit distance in image coordinates in x direction
+MY = 0.5  # number of pixels per unit distance in image coordinates in y direction
+X = np.array([-1, 2, 3])
+Xh = to_homogeneus(X)
+K = get_calibration_matrix(F, px=PX, py=PY, mx=MX, my=MY)
+P = get_projection_matrix(F, px=PX, py=PY, mx=MX, my=MY)
+xh = P @ Xh
+x = to_inhomogeneus(xh)
+print("\nX:\n", X)
+print("\nCalibration matrix (K):\n", K)
+print("\nProjection matrix (P):\n", P)
+print("\nx:\n", x)
+fig = plt.figure(figsize=(IMAGE_WIDTH, IMAGE_HEIGTH))
+ax = fig.gca()
+image.draw()
+G.draw(F, px=PX, py=PY)
+G.draw(F, px=PX, py=PY, mx=MX, my=MY, color="tab:purple")
+ax.set_title("Image of the Point X for a Pinhole (Green) and a CCD (Purple) Camera")
+plt.tight_layout()
+# plt.show()
+
+
+##############################################################################################################
+FOCAL_LENGTH = 3.0  # focal length
+PX = 2.0  # principal point x-coordinate
+PY = 1.0  # principal point y-coordinate
+MX = 1  # number of pixels per unit distance in image coordinates in x direction
+MY = 1  # number of pixels per unit distance in image coordinates in y direction
+THETA_X = np.pi / 2.0  # roll angle
+THETA_Y = 0.0  # pitch angle
+THETA_Z = np.pi  # yaw angle
+C = np.array([3, -5, 2])  # camera centre
+IMAGE_HEIGTH = 4
+IMAGE_WIDTH = 6
+calibration_kwargs = {"f": FOCAL_LENGTH, "px": PX, "py": PY, "mx": MX, "my": MY}
+rotation_kwargs = {"theta_x": THETA_X, "theta_y": THETA_Y, "theta_z": THETA_Z}
+projection_kwargs = {**calibration_kwargs, **rotation_kwargs, "C": C}
+K = get_calibration_matrix(**calibration_kwargs)
+print("Calibration matrix (K):\n", K.round(DECIMALS))
+R = get_rotation_matrix(**rotation_kwargs)
+print("\nRotation matrix (R):\n", R.round(DECIMALS))
+P = get_projection_matrix(**projection_kwargs)
+print("\nProjection matrix (P):\n", P.round(DECIMALS))
+dx, dy, dz = np.eye(3)
+world_frame = ReferenceFrame(
+    origin=np.zeros(3),
+    dx=dx,
+    dy=dy,
+    dz=dz,
+    name="World",
+)
+camera_frame = ReferenceFrame(
+    origin=C,
+    dx=R @ dx,
+    dy=R @ dy,
+    dz=R @ dz,
+    name="Camera",
+)
+Z = PrincipalAxis(
+    camera_center=C,
+    camera_dz=camera_frame.dz,
+    f=FOCAL_LENGTH,
+)
+image_frame = ReferenceFrame(
+    origin=Z.p - camera_frame.dx * PX - camera_frame.dy * PY,
+    dx=R @ dx,
+    dy=R @ dy,
+    dz=R @ dz,
+    name="Image",
+)
+image_plane = ImagePlane(
+    origin=image_frame.origin,
+    dx=image_frame.dx,
+    dy=image_frame.dy,
+    heigth=IMAGE_HEIGTH,
+    width=IMAGE_WIDTH,
+    mx=MX,
+    my=MY,
+)
+image = Image(heigth=IMAGE_HEIGTH, width=IMAGE_WIDTH)
+square1 = Polygon(np.array([
+    [-1.0, 5.0, 4.0],
+    [1.0, 3.0, 5.0],
+    [1.0, 2.0, 2.0],
+    [-1.0, 4.0, 1.0],
+]))
+square2 = Polygon(np.array([
+    [-2.0, 4.0, 5.0],
+    [2.0, 4.0, 5.0],
+    [2.0, 4.0, 1.0],
+    [-2.0, 4.0, 1.0],
+]))
+fig = plt.figure(figsize=(6, 6))
+ax = plt.axes(projection="3d")
+world_frame.draw3d(ax=ax)
+camera_frame.draw3d(ax=ax)
+image_frame.draw3d(ax=ax)
+Z.draw3d(ax=ax)
+image_plane.draw3d(ax=ax)
+square1.draw3d(pi=image_plane.pi, C=C, ax=ax)
+square2.draw3d(pi=image_plane.pi, C=C, color="tab:purple", ax=ax)
+ax.view_init(elev=45.0, azim=45.0)
+ax.set_title("CCD Camera Geometry")
+plt.tight_layout()
+plt.show()
+
+fig = plt.figure(figsize=(IMAGE_WIDTH, IMAGE_HEIGTH))
+ax = fig.gca()
+image.draw()
+square1.draw(**projection_kwargs)
+square2.draw(**projection_kwargs, color="tab:purple")
+ax.set_title("Projection of Squares in the Image")
 plt.tight_layout()
 plt.show()
