@@ -8,7 +8,7 @@ x = np.linspace(0, 1, 100)
 y = np.sin(x * 2 * np.pi) / 2 + 0.5
 ax.plot(x, y, zs=0, zdir='z', label='curve in (x, y)')
 
-# Plot scatterplot data (20 2D points per colour) on the x and z axes.
+# Plot scatter plot data (20 2D points per colour) on the x and z axes.
 colors = ('r', 'g', 'b', 'k')
 
 # Fixing random state for reproducibility
@@ -32,7 +32,7 @@ ax.set_xlabel('X')
 ax.set_ylabel('Y')
 ax.set_zlabel('Z')
 
-# Customize the view angle so it's easier to see that the scatter points lie
+# Customize the view angle, so it's easier to see that the scatter points lie
 # on the plane y=0
 ax.view_init(elev=20., azim=-35, roll=0)
 

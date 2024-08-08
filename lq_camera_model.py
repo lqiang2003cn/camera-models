@@ -1,3 +1,5 @@
+
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -6,7 +8,7 @@ from camera_models import *  # our package
 DECIMALS = 2  # how many decimal places to use in print
 
 X = np.array([4.0, 2.0, 3.0])
-print(f"X: {X}")
+print(f"X:{X}")
 Xh = to_homogeneus(X)
 print(f"X in homogeneous coordinates: {Xh}")
 
