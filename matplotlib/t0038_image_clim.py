@@ -9,12 +9,11 @@ print(img)
 lum_img = img[:, :, 0]
 print(lum_img)
 
-# 1. cmap
-# plt.imshow(lum_img, cmap="hot")
+r = lum_img.ravel()
 
-# 2. set_cmap
-imgplot = plt.imshow(lum_img)
-# imgplot.set_cmap('nipy_spectral')
+# plt.imshow(lum_img, clim=(0, 175))
+im = plt.imshow(lum_img)
+im.set_clim(0, 175)
 plt.colorbar()
 
 plt.show()
